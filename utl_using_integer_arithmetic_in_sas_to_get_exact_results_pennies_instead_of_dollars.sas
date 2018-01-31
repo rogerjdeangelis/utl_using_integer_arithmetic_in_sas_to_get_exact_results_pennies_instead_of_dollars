@@ -103,4 +103,45 @@ Obs     FLAG        X
  2        1       0.0
  3        1       0.1
  4        1       0.2
+ 
+ 
+ Example of the issue 
+ 
+ It depends on the numbers and the floating point representation;
+
+data many;
+ do i=1 to 20000;
+   x=1.00000001;
+   output;
+ end;
+run;quit;
+
+proc sql;
+  select sum(x) as sumx fromat=18.9 from many;
+;quit;
+
+              sumx
+------------------
+   20000.000200009    *** wrong sum;
+
+
+
+data many;
+ do i=1 to 20000;
+   x=100000001;
+   output;
+ end;
+run;quit;
+
+proc sql;
+  select sum(x)/10**8 as sumx fromat=18.10 from many;
+;quit;
+
+              sumx
+------------------
+  20000.0002000000    ** correct sum;
+
+
+
+
 
